@@ -568,3 +568,117 @@ PRINT 'Tablas Cargadas ...'
               VIEWS, FUNCTIONS, PROCEDURES, TRIGGERS
 **************************************************************************** */
 
+GO
+IF OBJECT_ID ('JJFG.VerificarPassword') IS NOT NULL
+   DROP PROCEDURE JJFG.VerificarPassword; 
+GO
+
+GO
+CREATE PROCEDURE JJFG.VerificarPassword @usu_password varchar(255)
+as
+   select Usua_Username from JJFG.USUARIO where Usua_Password = HASHBYTES('SHA2_256',@usu_password)
+GO
+
+--exec JJFG.VerificarPassword 'w23e'
+
+
+
+GO
+IF OBJECT_ID ('JJFG.VerificarCuentaHabilitada') IS NOT NULL
+   DROP PROCEDURE JJFG.VerificarCuentaHabilitada; 
+GO
+
+GO
+CREATE PROCEDURE JJFG.VerificarCuentaHabilitada @usu_id int
+as
+   select Usua_Username from JJFG.USUARIO where Usua_ID = @usu_id and 
+                                                Usua_Login_Fallidos < 3 and
+												Usua_Habilitado = 1
+GO
+
+-- exec JJFG.VerificarCuentaHabilitada '3'
+
+
+/*
+GO
+IF OBJECT_ID ('JJFG.Fn_obtenerLoginFallidos') IS NOT NULL
+   DROP FUNCTION JJFG.Fn_obtenerLoginFallidoss; 
+GO
+
+GO
+CREATE FUNCTION  JJFG.Fn_obtenerLoginFallidos (@usu_id int)
+returns int
+as
+  Begin
+    Declare @cantidad int 
+    set @cantidad = (select Usua_Login_Fallidos from JJFG.USUARIO where Usua_ID = @usu_id)
+	Return(@cantidad)
+  End
+GO
+
+-- select JJFG.Fn_obtenerLoginFallidos (3)
+*/
+
+GO
+IF OBJECT_ID ('JJFG.obtenerLoginFallidos') IS NOT NULL
+   DROP PROCEDURE JJFG.obtenerLoginFallidos; 
+GO
+
+GO
+CREATE PROCEDURE JJFG.obtenerLoginFallidos @usu_id int
+as
+   select Usua_Login_Fallidos from JJFG.USUARIO where Usua_ID = @usu_id
+GO
+
+
+-- exec JJFG.obtenerLoginFallidos '3'
+
+
+GO
+IF OBJECT_ID ('JJFG.SumarUnLoginFallido') IS NOT NULL
+   DROP PROCEDURE JJFG.SumarUnLoginFallido ; 
+GO
+
+GO
+CREATE PROCEDURE JJFG.SumarUnLoginFallido @usu_id int
+as
+   UPDATE JJFG.USUARIO
+   SET Usua_Login_Fallidos = Usua_Login_Fallidos + 1
+   WHERE Usua_ID = @usu_id AND Usua_ID != 1
+GO
+
+
+-- execute JJFG.SumarUnLoginFallido '1'
+
+
+GO
+IF OBJECT_ID ('JJFG.ResetearLoginFallido') IS NOT NULL
+   DROP PROCEDURE JJFG.ResetearLoginFallido ; 
+GO
+
+GO
+CREATE PROCEDURE JJFG.ResetearLoginFallido @usu_id int
+as
+   UPDATE JJFG.USUARIO
+   SET Usua_Login_Fallidos = 0
+   WHERE Usua_ID = @usu_id
+GO
+
+-- execute JJFG.ResetearLoginFallido '3'
+
+
+GO
+IF OBJECT_ID ('JJFG.TraerRolId') IS NOT NULL
+   DROP PROCEDURE JJFG.TraerRolId; 
+GO
+
+GO
+CREATE PROCEDURE JJFG.TraerRolId @usu_id int
+as
+   select Rol_ID from JJFG.ROL join ROL_X_USUARIO on Rol_ID = RxU_Rol_Id
+                               join USUARIO on RxU_Usua_Id = Usua_ID  
+   where Usua_ID = @usu_id
+GO
+
+
+--exec JJFG.TraerRolId '5'
